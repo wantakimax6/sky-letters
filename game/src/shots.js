@@ -31,18 +31,31 @@ function flyFor(world, seconds) {
   }
 }
 
+// Stage the exact flight state a shot shows: letters delivered must
+// match the mission (Letter 3 => 2 already delivered, and so on), and
+// each shot reads at its own plausible speed and altitude.
+function stageState(world, letters, speed, alt, throttle, pitch) {
+  const p = world.state.plane;
+  world.state.letters = letters;
+  world.state.deliveredCount = letters;
+  p.speed = speed; p.alt = alt; p.throttle = throttle;
+  p.pitch = pitch || 0; p.vs = pitch ? -6 : 0;
+}
+
 export function stageShot(name, world) {
   const shot = name || 'cover';
   if (shot === 'cover') {
     world.startMission(0);
     world.advanceDialogue(); world.advanceDialogue();
     flyFor(world, 5.5);
+    stageState(world, 0, 82, 85, 0.42, 0);
     return { screen: SCREEN_PLAY, best: 0 };
   }
   if (shot === 'storm') {
     world.startMission(2);
     world.advanceDialogue(); world.advanceDialogue();
     flyFor(world, 15);
+    stageState(world, 2, 68, 62, 0.26, 0);
     // A mid-flight word from Agus, as the canyon opens ahead: the
     // dialogue overlay is a real game state, shown while flying.
     world.state.dialogue = { lines: [{ who: 'agus', text: 'So my brother finally wrote... Fly low, little pilot. The canyon is narrow, but so is a grudge.' }], kind: 'mid' };
@@ -53,12 +66,14 @@ export function stageShot(name, world) {
     world.startMission(3);
     world.advanceDialogue(); world.advanceDialogue();
     flyFor(world, 21);
+    stageState(world, 3, 61, 48, 0.18, -0.15);
     return { screen: SCREEN_PLAY, best: 0 };
   }
   if (shot === 'sunset') {
     world.startMission(4);
     world.advanceDialogue(); world.advanceDialogue();
     flyFor(world, 15);
+    stageState(world, 4, 74, 120, 0.33, 0);
     return { screen: SCREEN_PLAY, best: 0 };
   }
   world.startMission(0);

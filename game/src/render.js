@@ -3,7 +3,7 @@
 // Chase camera, terrain, Pipit, particles, HUD, dialogue overlay, and the
 // title, pause, crash, delivered and ending screens.
 import { VIEW, FONT, PALETTE } from './config.js';
-import { cameraFor, drawTerrain, islandById, MISSION_TARGETS, project } from './terrain.js';
+import { cameraFor, drawTerrain, drawIslandLabels, islandById, MISSION_TARGETS, project } from './terrain.js';
 import { drawPlane } from './plane.js';
 import { drawHud } from './hud.js';
 import { drawPortrait, CHARACTER_NAMES } from './characters.js';
@@ -53,15 +53,18 @@ export function createRenderer(canvas, particles, clouds) {
     const line = s.dialogue.lines[s.dialogueIndex];
     if (!line) return;
     const m = world.mission();
+    // Narrower, higher dialogue panel: it must leave the artificial
+    // horizon gauge (bottom-left) and the Pipit Condition bar
+    // (bottom-right) fully visible.
     ctx.fillStyle = 'rgba(20,16,30,0.78)';
-    ctx.beginPath(); ctx.roundRect(90, VIEW.height - 178, VIEW.width - 180, 158, 16); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(170, VIEW.height - 172, 840, 132, 16); ctx.fill();
     ctx.strokeStyle = 'rgba(255,201,60,0.7)'; ctx.lineWidth = 2; ctx.stroke();
-    drawPortrait(ctx, line.who, 168, VIEW.height - 100, 120, 'happy');
-    text(ctx, CHARACTER_NAMES[line.who] || line.who, 250, VIEW.height - 138, 17, '#ffc93c', 'left', 800);
-    text(ctx, `Letter ${m.id} — ${m.name}`, 250, VIEW.height - 114, 13, '#bfe8f2', 'left');
+    drawPortrait(ctx, line.who, 232, VIEW.height - 106, 96, 'happy');
+    text(ctx, CHARACTER_NAMES[line.who] || line.who, 300, VIEW.height - 142, 17, '#ffc93c', 'left', 800);
+    text(ctx, `Letter ${m.id} — ${m.name}`, 300, VIEW.height - 120, 13, '#bfe8f2', 'left');
     ctx.fillStyle = '#fff';
-    wrapText(ctx, line.text, 250, VIEW.height - 84, VIEW.width - 360, 26, 18);
-    text(ctx, 'Press Enter to continue  ▸', VIEW.width - 130, VIEW.height - 34, 14, '#ffd9a0', 'right');
+    wrapText(ctx, line.text, 300, VIEW.height - 92, 690, 24, 17);
+    text(ctx, 'Press Enter to continue  ▸', VIEW.width - 290, VIEW.height - 52, 14, '#ffd9a0', 'right');
   }
 
   function drawTitle(world) {
@@ -138,6 +141,9 @@ export function createRenderer(canvas, particles, clouds) {
     // Petals drift up on the final flight.
     if (m.id === 5 && s.mode === 'fly') particles.petals(px, py - 40, 1);
     if (screen !== SCREEN_TITLE) drawHud(ctx, world, screen);
+    // Island labels last (after terrain, rings, clouds, plane and HUD),
+    // so no label is ever half-hidden by any of them.
+    if (screen !== SCREEN_TITLE) drawIslandLabels(ctx, cam);
     if (screen === SCREEN_PLAY) drawDialogue(world);
     if (screen === SCREEN_TITLE) drawTitle(world);
     else if (screen === SCREEN_CRASH) drawCrash(world);

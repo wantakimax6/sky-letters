@@ -65,14 +65,21 @@ export function drawPlane(ctx, cx, cy, scale, bank, pitch, propAngle, scarfWave,
   ctx.strokeStyle = '#c98a5a'; ctx.lineWidth = 2;
   ctx.beginPath(); ctx.moveTo(-6, 18); ctx.lineTo(-2, 38); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(26, 16); ctx.lineTo(30, 38); ctx.stroke();
-  // Propeller: spinning blur disc + two blades at propAngle.
+  // Propeller: a translucent spinning blur disc, never a solid bar.
+  // Two faint blades at propAngle inside a light-grey disc, so the
+  // nose reads as a spinning prop, not a stick across the plane.
   ctx.save();
   ctx.translate(72, -2);
-  ctx.fillStyle = 'rgba(255,255,255,0.22)';
-  ctx.beginPath(); ctx.ellipse(0, 0, 10, 44, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = 'rgba(235,242,248,0.30)';
+  ctx.beginPath(); ctx.ellipse(0, 0, 13, 46, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.ellipse(0, 0, 13, 46, 0, 0, Math.PI * 2); ctx.stroke();
   ctx.rotate(propAngle);
-  ctx.fillStyle = '#3a2a1c';
-  ctx.beginPath(); ctx.roundRect(-4, -42, 8, 84, 4); ctx.fill();
+  ctx.fillStyle = 'rgba(90,70,55,0.28)';
+  ctx.beginPath(); ctx.roundRect(-3, -42, 6, 84, 3); ctx.fill();
+  ctx.rotate(Math.PI / 2);
+  ctx.fillStyle = 'rgba(90,70,55,0.18)';
+  ctx.beginPath(); ctx.roundRect(-2.5, -40, 5, 80, 2.5); ctx.fill();
   ctx.restore();
   ctx.fillStyle = '#d93b2b'; ctx.beginPath(); ctx.arc(72, -2, 7, 0, Math.PI * 2); ctx.fill();
   // Damage smoke puffs when hurt.
